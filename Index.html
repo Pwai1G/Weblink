@@ -23,7 +23,7 @@
       }
 
       .right {
-        width: 50%;
+        width: 40%;
         background-color: #f4f4f4;
         padding: 20px;
         font-size: 18px;
@@ -107,6 +107,37 @@
 
       <div class="right">
         <h2>Manage Table/Link</h2>
+
+        <!-- เพิ่มปุ่ม Filter Table ด้านล่าง Manage Table/Link -->
+        <h3>Filter Table</h3>
+        <input
+          type="text"
+          id="filterInput"
+          placeholder="Enter keyword to filter"
+          onkeyup="filterTables()"
+        />
+
+        <script>
+          function filterTables() {
+            const keyword = document
+              .getElementById("filterInput")
+              .value.toLowerCase();
+            const headings = document.querySelectorAll(".left h2");
+
+            headings.forEach((heading) => {
+              const table = heading.nextElementSibling;
+              if (table && table.tagName.toLowerCase() === "table") {
+                if (heading.textContent.toLowerCase().includes(keyword)) {
+                  heading.style.display = "";
+                  table.style.display = "";
+                } else {
+                  heading.style.display = "none";
+                  table.style.display = "none";
+                }
+              }
+            });
+          }
+        </script>
 
         <div class="form-container">
           <h3>Add/Remove link</h3>
