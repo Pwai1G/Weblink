@@ -62,7 +62,7 @@
 
       .form-container {
         margin-top: 20px;
-        text-align: center;
+        text-align: left;
       }
 
       select,
@@ -110,16 +110,16 @@
 
         <div class="form-container">
           <h3>Add/Remove link</h3>
-          <select id="tableSelect"></select>
-          <input type="text" id="linkName" placeholder="Link name" />
-          <input type="url" id="linkURL" placeholder="URL" />
+          <select id="tableSelect"></select
+          ><br />
+          <input type="text" id="linkName" placeholder="Link name" /><br />
+          <input type="url" id="linkURL" placeholder="URL" /><br />
           <button onclick="addLink()">Add link</button>
           <button onclick="deleteLink()">Delete link</button>
 
           <h3>Add/Remove Table</h3>
           <input type="text" id="newTableName" placeholder="Table name" />
           <button onclick="addTable()">Add Table</button>
-
           <div class="delete-table-container">
             <select id="tableDeleteSelect"></select>
             <button class="delete-table-button" onclick="deleteTable()">
