@@ -106,35 +106,35 @@
       </div>
 
       <div class="right">
-        <h2>จัดการลิงก์และตาราง</h2>
+        <h2>Manage Table/Link</h2>
 
         <div class="form-container">
-          <h3>เพิ่ม/ลบ ลิงก์</h3>
+          <h3>Add/Remove link</h3>
           <select id="tableSelect"></select>
-          <input type="text" id="linkName" placeholder="ชื่อลิงก์" />
+          <input type="text" id="linkName" placeholder="Link name" />
           <input type="url" id="linkURL" placeholder="URL" />
-          <button onclick="addLink()">เพิ่มลิงก์</button>
-          <button onclick="deleteLink()">ลบลิงก์</button>
+          <button onclick="addLink()">Add link</button>
+          <button onclick="deleteLink()">Delete link</button>
 
-          <h3>เพิ่ม/ลบ ตาราง</h3>
-          <input type="text" id="newTableName" placeholder="ชื่อตารางใหม่" />
-          <button onclick="addTable()">เพิ่มตาราง</button>
+          <h3>Add/Remove Table</h3>
+          <input type="text" id="newTableName" placeholder="Table name" />
+          <button onclick="addTable()">Add Table</button>
 
           <div class="delete-table-container">
             <select id="tableDeleteSelect"></select>
             <button class="delete-table-button" onclick="deleteTable()">
-              ลบตาราง
+              Remove Table
             </button>
           </div>
 
           <!-- เพิ่มปุ่ม Export และ Import -->
-          <h3>จัดการข้อมูล</h3>
-          <button onclick="exportData()">Export ข้อมูล</button>
-          <button onclick="importData()">Import ข้อมูล</button>
+          <h3>Manage Data</h3>
+          <button onclick="exportData()">Export</button>
+          <button onclick="importData()">Import</button>
           <input type="file" id="importFile" style="display: none" />
 
           <!-- เพิ่มปุ่ม Clear Screen -->
-          <h3>จัดการหน้าจอ</h3>
+          <h3>Clear Screen</h3>
           <button onclick="clearScreen()">Clear Screen</button>
         </div>
 
