@@ -162,6 +162,7 @@
           <h3>Manage Data</h3>
           <button onclick="exportData()">Export</button>
           <button onclick="importData()">Import</button>
+          <button onclick="importDefaultData()">Import Default</button>
           <input type="file" id="importFile" style="display: none" />
 
           <!-- เพิ่มปุ่ม Clear Screen -->
@@ -450,6 +451,26 @@
           // รีโหลดหน้าเว็บเพื่อล้างหน้าจอ
           window.location.reload();
         }
+      }
+
+      function importDefaultData() {
+        fetch("Default_List.JSON")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.tables && data.links) {
+              localStorage.setItem("tables", JSON.stringify(data.tables));
+              localStorage.setItem("links", JSON.stringify(data.links));
+
+              showStatusMessage("Import Default สำเร็จแล้ว!");
+              window.location.reload(); // รีโหลดหน้าเพื่ออัปเดตตาราง
+            } else {
+              showStatusMessage("ไฟล์ Default_List.JSON ไม่ถูกต้อง!");
+            }
+          })
+          .catch((error) => {
+            console.error("Error loading Default_List.JSON:", error);
+            showStatusMessage("เกิดข้อผิดพลาดในการโหลด Default_List.JSON");
+          });
       }
     </script>
   </body>

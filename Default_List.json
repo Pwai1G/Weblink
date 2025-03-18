@@ -1,9 +1,9 @@
 {
   "tables": [
-    "Default_List"
+    "Genesys"
   ],
   "links": {
-    "Default_List": [
+    "Genesys": [
       {
         "name": "Genesys Mypurecloud",
         "url": "https://login.mypurecloud.jp/"
