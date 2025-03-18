@@ -126,6 +126,16 @@
               ลบตาราง
             </button>
           </div>
+
+          <!-- เพิ่มปุ่ม Export และ Import -->
+          <h3>จัดการข้อมูล</h3>
+          <button onclick="exportData()">Export ข้อมูล</button>
+          <button onclick="importData()">Import ข้อมูล</button>
+          <input type="file" id="importFile" style="display: none" />
+
+          <!-- เพิ่มปุ่ม Clear Screen -->
+          <h3>จัดการหน้าจอ</h3>
+          <button onclick="clearScreen()">Clear Screen</button>
         </div>
 
         <div class="status-message" id="statusMessage"></div>
@@ -341,6 +351,53 @@
         }
       }
 
+      function exportData() {
+        const tables = JSON.parse(localStorage.getItem("tables")) || [];
+        const links = JSON.parse(localStorage.getItem("links")) || {};
+
+        const data = {
+          tables: tables,
+          links: links,
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "table_data.json";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        showStatusMessage("ข้อมูลถูก Export แล้ว");
+      }
+
+      function importData() {
+        const fileInput = document.getElementById("importFile");
+        fileInput.click();
+
+        fileInput.onchange = function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              try {
+                const data = JSON.parse(e.target.result);
+                localStorage.setItem("tables", JSON.stringify(data.tables));
+                localStorage.setItem("links", JSON.stringify(data.links));
+
+                // Reload the page to reflect the changes
+                window.location.reload();
+              } catch (error) {
+                showStatusMessage("ไฟล์ไม่ถูกต้อง");
+              }
+            };
+            reader.readAsText(file);
+          }
+        };
+      }
+
       function showStatusMessage(message) {
         const statusMessage = document.getElementById("statusMessage");
         statusMessage.textContent = message;
@@ -348,6 +405,20 @@
         setTimeout(() => {
           statusMessage.style.display = "none";
         }, 3000);
+      }
+
+      function clearScreen() {
+        const confirmClear = window.confirm(
+          "คุณแน่ใจที่จะล้างหน้าจอทั้งหมด? การกระทำนี้จะลบทุกตารางและลิงก์!"
+        );
+        if (confirmClear) {
+          // ล้างข้อมูลใน localStorage
+          localStorage.removeItem("tables");
+          localStorage.removeItem("links");
+
+          // รีโหลดหน้าเว็บเพื่อล้างหน้าจอ
+          window.location.reload();
+        }
       }
     </script>
   </body>
