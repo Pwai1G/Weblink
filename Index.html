@@ -454,7 +454,7 @@
       }
 
       function importDefaultData() {
-        fetch("Default_List.JSON")
+        fetch("https://pwai1g.github.io/Weblink/Default_List.json")
           .then((response) => response.json())
           .then((data) => {
             if (data.tables && data.links) {
