@@ -96,6 +96,9 @@
         <button onclick="importDefaultData()">Import Link</button>
         <h3>Clear Screen</h3>
         <button onclick="clearScreen()">Clear Screen</button>
+        <h3>Clear Cache</h3>
+        <button onclick="clearCache()">Clear Cache</button>
+        <div><br /></div>
       </div>
     </div>
 
@@ -228,6 +231,26 @@
             console.error("❌ เกิดข้อผิดพลาด:", error);
             alert("เกิดข้อผิดพลาดในการโหลด Default_List.json");
           });
+      }
+      function clearCache() {
+        const confirmClear = window.confirm(
+          "คุณแน่ใจที่จะเคลียร์แคชและรีเซ็ตข้อมูลทั้งหมดหรือไม่?"
+        );
+
+        if (confirmClear) {
+          // 🔴 ล้าง Local Storage
+          localStorage.removeItem("tables");
+          localStorage.removeItem("links");
+          localStorage.clear();
+
+          // 🔴 ล้างแคชของเบราว์เซอร์
+          caches.keys().then((names) => {
+            names.forEach((name) => caches.delete(name));
+          });
+
+          // 🔄 รีโหลดหน้าใหม่เพื่อให้โหลด JSON ล่าสุด
+          location.reload(true);
+        }
       }
     </script>
   </body>
