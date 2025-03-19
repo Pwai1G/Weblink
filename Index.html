@@ -165,11 +165,12 @@
           <h3>Add/Remove Table</h3>
           <div></div>
           <input type="text" id="newTableName" placeholder="Table name" />
-          <button onclick="addTable()">Add Table</button>
           <div class="delete-table-container">
             <select id="tableDeleteSelect"></select>
+            <div></div>
+            <button onclick="addTable()">Add</button>
             <button class="delete-table-button" onclick="deleteTable()">
-              Remove Table
+              Remove
             </button>
           </div>
           </div>
@@ -178,6 +179,7 @@
           <h3>Manage Data</h3>
             <button onclick="exportData()">Export</button>
             <button onclick="importData()">Import</button>
+            <div><br></div>
             <button onclick="importDefaultData()">Import Default</button>
             <input type="file" id="importFile" style="display: none" />
 
@@ -185,7 +187,9 @@
           <!-- เพิ่มปุ่ม Clear Screen -->
           <h3>Clear Screen</h3>
           <button onclick="clearScreen()">Clear Screen</button>
-          <button onclick="logout()">Logout</button>
+          <div><br></div>
+          <h3>Log out</h3>
+          <button onclick="logout()">Log out</button>
 
         </div>  
         </div>
