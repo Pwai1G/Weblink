@@ -174,10 +174,6 @@
     <div class="status-message" id="statusMessage"></div>
 
     <script>
-      window.onload = function () {
-        if (localStorage.getItem("loggedIn") !== "true") {
-          window.location.href = "login.html";
-        }
 
         const tables = JSON.parse(localStorage.getItem("tables")) || [];
         const links = JSON.parse(localStorage.getItem("links")) || {};
@@ -272,7 +268,7 @@
             : "http://" + linkURL;
 
           const newRow = table.querySelector("tbody").insertRow();
-          newRow.innerHTML = ` 
+          newRow.innerHTML = `
             <td>${linkName}</td>
             <td><button onclick="window.open('${fullURL}', '_blank')">Click</button></td>
           `;
