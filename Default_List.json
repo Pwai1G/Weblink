@@ -1,26 +1,12 @@
 {
   "tables": [
-    "Test1",
-    "Test2",
-    "Test3"
+    "Genesys"
   ],
   "links": {
-    "Test1": [
+    "Genesys": [
       {
-        "name": "google",
-        "url": "http://www.google.com"
-      }
-    ],
-    "Test2": [
-      {
-        "name": "google",
-        "url": "http://www.google.com"
-      }
-    ],
-    "Test3": [
-      {
-        "name": "google",
-        "url": "http://www.google.com"
+        "name": "Genesys Mypurecloud",
+        "url": "https://login.mypurecloud.jp/"
       }
     ]
   }
