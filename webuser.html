@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quick Link</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+      }
+      .container {
+        height: auto;
+        padding: 1px;
+        display: flex;
+      }
+
+      .left {
+        width: 80%;
+        padding: 20px;
+        overflow-y: auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .right {
+        width: auto;
+        background-color: #f4f4f4;
+        padding: 20px;
+        font-size: 12px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 10px 0;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f4f4f4;
+      }
+
+      button {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: linear-gradient(135deg, #0056b3, #003f7f);
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left">
+        <h2 style="text-align: center; display: inline-block">
+          Link Management
+        </h2>
+        <button id="refreshButton" onclick="refreshPage()">🔄 Refresh</button>
+        <div id="tables-container"></div>
+      </div>
+
+      <div class="right">
+        <h2>Manage Data</h2>
+
+        <input
+          type="file"
+          id="importFile"
+          style="display: none"
+          accept=".json"
+        />
+        <button onclick="importDefaultData()">Import Link</button>
+        <h3>Clear Screen</h3>
+        <button onclick="clearScreen()">Clear Screen</button>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        console.log("✅ JavaScript Loaded!");
+        document
+          .getElementById("refreshButton")
+          .addEventListener("click", function () {
+            location.reload();
+          });
+        loadTables();
+      });
+
+      function loadTables() {
+        const tablesContainer = document.getElementById("tables-container");
+        const tables = JSON.parse(localStorage.getItem("tables")) || [];
+        const links = JSON.parse(localStorage.getItem("links")) || {};
+        tablesContainer.innerHTML = "";
+        tables.forEach((tableName) => {
+          const tableDiv = document.createElement("div");
+          tableDiv.innerHTML = `<h3>${tableName}</h3>`;
+
+          const table = document.createElement("table");
+          table.innerHTML = `
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${
+                links[tableName]
+                  ? links[tableName]
+                      .map(
+                        (link) => `
+                <tr>
+                  <td>${link.name}</td>
+                  <td><button onclick="window.open('${link.url}', '_blank')">Click</button></td>
+                </tr>
+              `
+                      )
+                      .join("")
+                  : ""
+              }
+            </tbody>
+          `;
+
+          tableDiv.appendChild(table);
+          tablesContainer.appendChild(tableDiv);
+        });
+      }
+
+      function exportData() {
+        const data = {
+          tables: JSON.parse(localStorage.getItem("tables")) || [],
+          links: JSON.parse(localStorage.getItem("links")) || {},
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "table_data.json";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      function importData() {
+        const fileInput = document.getElementById("importFile");
+        fileInput.click();
+        fileInput.onchange = function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              try {
+                const data = JSON.parse(e.target.result);
+                localStorage.setItem("tables", JSON.stringify(data.tables));
+                localStorage.setItem("links", JSON.stringify(data.links));
+                location.reload();
+              } catch (error) {
+                alert("ไฟล์ไม่ถูกต้อง");
+              }
+            };
+            reader.readAsText(file);
+          }
+        };
+      }
+
+      function clearScreen() {
+        if (confirm("คุณแน่ใจที่จะล้างหน้าจอทั้งหมด?")) {
+          localStorage.removeItem("tables");
+          localStorage.removeItem("links");
+          location.reload();
+        }
+      }
+
+      function logout() {
+        if (confirm("คุณต้องการออกจากระบบหรือไม่?")) {
+          localStorage.removeItem("loggedIn");
+          window.location.href = "login.html";
+        }
+      }
+      function importDefaultData() {
+        console.log("⏳ กำลังโหลด Default Data...");
+
+        fetch("https://pwai1g.github.io/Weblink/Default_List.json")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("ไม่สามารถโหลดไฟล์ Default_List.json ได้");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            if (data.tables && data.links) {
+              localStorage.setItem("tables", JSON.stringify(data.tables));
+              localStorage.setItem("links", JSON.stringify(data.links));
+
+              console.log("✅ Default Data นำเข้าเรียบร้อย!");
+              alert("Import Default สำเร็จแล้ว!");
+              location.reload();
+            } else {
+              alert("⚠️ ไฟล์ Default_List.json ไม่ถูกต้อง!");
+            }
+          })
+          .catch((error) => {
+            console.error("❌ เกิดข้อผิดพลาด:", error);
+            alert("เกิดข้อผิดพลาดในการโหลด Default_List.json");
+          });
+      }
+    </script>
+  </body>
+</html>
