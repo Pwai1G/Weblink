@@ -183,7 +183,12 @@
         <button onclick="exportData()">Export</button>
         <button onclick="importData()">Import</button>
         <div><br /></div>
+        <h3>Default Data</h3>
         <button onclick="importDefaultData()">Import Default</button>
+        <div><br /></div>
+        <h3>Update Data</h3>
+        <button onclick="updateDefaultData()">Update Default</button>
+
         <input type="file" id="importFile" style="display: none" />
 
         <div><br /></div>
@@ -505,6 +510,57 @@
       }
       function refreshPage() {
         location.reload(); // รีโหลดหน้าเว็บใหม่
+      }
+
+      function updateDefaultData() {
+        const tables = JSON.parse(localStorage.getItem("tables")) || [];
+        const links = JSON.parse(localStorage.getItem("links")) || {};
+        const updatedData = JSON.stringify(
+          { tables: tables, links: links },
+          null,
+          2
+        );
+
+        const githubToken = "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"; // 🔴 ใส่ Token ที่นี่
+        const repoOwner = "pwai1g"; // 🔴 ชื่อเจ้าของ Repository
+        const repoName = "Weblink"; // 🔴 ชื่อ Repository
+        const filePath = "Default_List.json"; // 🔴 ไฟล์ที่ต้องการแก้ไข
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+        // ดึง SHA ล่าสุดของไฟล์ (GitHub ต้องใช้ SHA ของไฟล์เดิมเพื่ออัปเดต)
+        fetch(apiUrl, {
+          headers: { Authorization: `token ${githubToken}` },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const fileSha = data.sha; // SHA ของไฟล์ปัจจุบัน
+
+            // อัปเดตไฟล์ `Default_List.json`
+            fetch(apiUrl, {
+              method: "PUT",
+              headers: {
+                Authorization: `token ${githubToken}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                message: "Updated Default_List.json from website",
+                content: btoa(updatedData), // แปลง JSON เป็น Base64
+                sha: fileSha, // ต้องใช้ SHA ของไฟล์เดิม
+              }),
+            })
+              .then((response) => response.json())
+              .then(() => {
+                showStatusMessage("อัปเดต Default_List.json สำเร็จแล้ว! ✅");
+              })
+              .catch((error) => {
+                console.error("Error updating file:", error);
+                showStatusMessage("เกิดข้อผิดพลาดในการอัปเดตไฟล์ ❌");
+              });
+          })
+          .catch((error) => {
+            console.error("Error fetching file SHA:", error);
+            showStatusMessage("เกิดข้อผิดพลาดในการดึงข้อมูลไฟล์ ❌");
+          });
       }
     </script>
   </body>
