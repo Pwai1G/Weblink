@@ -115,7 +115,10 @@
   <body>
     <div class="container">
       <div class="left">
-        <h2 style="text-align: center">Link Management</h2>
+        <h2 style="text-align: center; display: inline-block">
+          Link Management
+        </h2>
+        <button id="refreshButton" onclick="refreshPage()">🔄 Refresh</button>
         <div id="tables-container"></div>
       </div>
 
@@ -152,16 +155,16 @@
             });
           }
         </script>
-      
+
         <div class="form-container">
           <h3>Add/Remove link</h3>
           <select id="tableSelect"></select
           ><br />
           <input type="text" id="linkName" placeholder="Link name" /><br />
           <input type="url" id="linkURL" placeholder="URL" /><br />
-          <button onclick="addLink()">Add link</button>
-          <button onclick="deleteLink()">Delete link</button>
-            <div><br></div>
+          <button onclick="addLink()">Add</button>
+          <button onclick="deleteLink()">Remove</button>
+          <div><br /></div>
           <h3>Add/Remove Table</h3>
           <div></div>
           <input type="text" id="newTableName" placeholder="Table name" />
@@ -173,31 +176,26 @@
               Remove
             </button>
           </div>
-          </div>
-          <div><br></div>
-          <!-- เพิ่มปุ่ม Export และ Import -->
-          <h3>Manage Data</h3>
-            <button onclick="exportData()">Export</button>
-            <button onclick="importData()">Import</button>
-            <div><br></div>
-            <button onclick="importDefaultData()">Import Default</button>
-            <input type="file" id="importFile" style="display: none" />
-
-            <div><br></div>
-          <!-- เพิ่มปุ่ม Clear Screen -->
-          <h3>Clear Screen</h3>
-          <button onclick="clearScreen()">Clear Screen</button>
-          <div><br></div>
-          <h3>Log out</h3>
-          <button onclick="logout()">Log out</button>
-
-        </div>  
         </div>
-        
+        <div><br /></div>
+        <!-- เพิ่มปุ่ม Export และ Import -->
+        <h3>Manage Data</h3>
+        <button onclick="exportData()">Export</button>
+        <button onclick="importData()">Import</button>
+        <div><br /></div>
+        <button onclick="importDefaultData()">Import Default</button>
+        <input type="file" id="importFile" style="display: none" />
 
-        <div class="status-message" id="statusMessage"></div>
+        <div><br /></div>
+        <!-- เพิ่มปุ่ม Clear Screen -->
+        <h3>Clear Screen</h3>
+        <button onclick="clearScreen()">Clear Screen</button>
+        <div><br /></div>
+        <h3>Log out</h3>
+        <button onclick="logout()">Log out</button>
       </div>
     </div>
+    <div class="status-message" id="statusMessage"></div>
 
     <script>
       window.onload = function () {
@@ -501,10 +499,13 @@
       function logout() {
         const confirmLogout = window.confirm("คุณต้องการออกจากระบบหรือไม่?");
         if (confirmLogout) {
-        localStorage.removeItem("loggedIn"); // ลบสถานะล็อกอิน
-        window.location.href = "login.html"; // ส่งผู้ใช้กลับไปหน้า Login
-    }
-}
+          localStorage.removeItem("loggedIn"); // ลบสถานะล็อกอิน
+          window.location.href = "login.html"; // ส่งผู้ใช้กลับไปหน้า Login
+        }
+      }
+      function refreshPage() {
+        location.reload(); // รีโหลดหน้าเว็บใหม่
+      }
     </script>
   </body>
 </html>
