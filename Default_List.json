@@ -1,20 +1,9 @@
 {
   "tables": [
-    "Genesys",
     "CardX Collection",
     "G-Able"
   ],
   "links": {
-    "Genesys": [
-      {
-        "name": "Genesys OSM",
-        "url": "https://gms.genesys.com/portal/en/home"
-      },
-      {
-        "name": "Genesys Support",
-        "url": "https://genesys.my.site.com/customercare"
-      }
-    ],
     "CardX Collection": [
       {
         "name": "Genesys UAT",
