@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quick Link</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+      }
+      .container {
+        height: auto;
+        padding: 1px;
+        display: flex;
+      }
+
+      .left {
+        width: 80%;
+        padding: 20px;
+        overflow-y: auto;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .right {
+        width: auto;
+        background-color: #f4f4f4;
+        padding: 20px;
+        font-size: 12px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 90%;
+        border-collapse: collapse;
+        margin: 10px auto;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+        width: 80%;
+      }
+
+      th {
+        background-color: #f4f4f4;
+        cursor: pointer;
+      }
+
+      button {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        padding: 5px 8px;
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+        background: linear-gradient(135deg, #0056b3, #003f7f);
+        transform: scale(1.05);
+      }
+
+      .form-container {
+        margin-top: 20px;
+        text-align: left;
+      }
+
+      select,
+      input[type="text"],
+      input[type="url"] {
+        margin: 5px;
+        padding: 8px;
+        width: 200px;
+      }
+
+      .form-container button {
+        margin-left: 10px;
+      }
+
+      .add-table-container {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .delete-table-button {
+        margin-top: 10px;
+      }
+
+      .status-message {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+        text-align: center;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left">
+        <h2 style="text-align: center; display: inline-block">
+          Link Management
+        </h2>
+        <button id="refreshButton" onclick="refreshPage()">🔄 Refresh</button>
+        <div id="tables-container"></div>
+      </div>
+
+      <div class="right">
+        <h2>Manage Table/Link</h2>
+
+        <!-- เพิ่มปุ่ม Filter Table ด้านล่าง Manage Table/Link -->
+        <h3>Filter Table</h3>
+        <input
+          type="text"
+          id="filterInput"
+          placeholder="Enter keyword to filter"
+          onkeyup="filterTables()"
+        />
+
+        <script>
+          function filterTables() {
+            const keyword = document
+              .getElementById("filterInput")
+              .value.toLowerCase();
+            const headings = document.querySelectorAll(".left h2");
+
+            headings.forEach((heading) => {
+              const table = heading.nextElementSibling;
+              if (table && table.tagName.toLowerCase() === "table") {
+                if (heading.textContent.toLowerCase().includes(keyword)) {
+                  heading.style.display = "";
+                  table.style.display = "";
+                } else {
+                  heading.style.display = "none";
+                  table.style.display = "none";
+                }
+              }
+            });
+          }
+        </script>
+
+        <!-- เพิ่มปุ่ม Export และ Import -->
+        <h3>Manage Data</h3>
+        <button onclick="exportData()">Export</button>
+        <button onclick="importData()">Import</button>
+        <div><br /></div>
+        <button onclick="importDefaultData()">Import Default</button>
+        <input type="file" id="importFile" style="display: none" />
+
+        <div><br /></div>
+        <!-- เพิ่มปุ่ม Clear Screen -->
+        <h3>Clear Screen</h3>
+        <button onclick="clearScreen()">Clear Screen</button>
+        <div><br /></div>
+      </div>
+    </div>
+    <div class="status-message" id="statusMessage"></div>
+
+    <script>
+      window.onload = function () {
+        if (localStorage.getItem("loggedIn") !== "true") {
+          window.location.href = "login.html";
+        }
+
+        const tables = JSON.parse(localStorage.getItem("tables")) || [];
+        const links = JSON.parse(localStorage.getItem("links")) || {};
+
+        tables.forEach((tableName) => {
+          createTable(tableName, links[tableName] || []);
+        });
+
+        updateTableSelect();
+      };
+
+      function createTable(tableName, links) {
+        const leftSection = document.querySelector(".left");
+        const newTableHeading = document.createElement("h2");
+        newTableHeading.textContent = tableName;
+        leftSection.appendChild(newTableHeading);
+
+        const newTable = document.createElement("table");
+        newTable.id = tableName;
+        newTable.innerHTML = `
+          <thead>
+              <tr>
+                  <th onclick="sortTable('${tableName}')">Name ⬍</th>
+                  <th>Link</th>
+              </tr>
+          </thead>
+          <tbody>
+            ${links
+              .map(
+                (link) =>
+                  `<tr><td>${link.name}</td><td><button onclick="window.open('${link.url}', '_blank')">Click</button></td></tr>`
+              )
+              .join("")}
+          </tbody>
+        `;
+        leftSection.appendChild(newTable);
+      }
+
+      function updateTableSelect() {
+        const select = document.getElementById("tableSelect");
+        const tableDeleteSelect = document.getElementById("tableDeleteSelect");
+
+        const tables = JSON.parse(localStorage.getItem("tables")) || [];
+
+        select.innerHTML = "";
+        tableDeleteSelect.innerHTML = "";
+        tables.forEach((tableName) => {
+          const option = document.createElement("option");
+          option.value = tableName;
+          option.textContent = tableName;
+          select.appendChild(option);
+
+          const deleteOption = document.createElement("option");
+          deleteOption.value = tableName;
+          deleteOption.textContent = tableName;
+          tableDeleteSelect.appendChild(deleteOption);
+        });
+      }
+
+      function sortTable(tableId) {
+        const table = document.getElementById(tableId);
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+
+        let ascending = table.dataset.ascending === "true";
+
+        rows.sort((rowA, rowB) => {
+          const nameA = rowA.cells[0].textContent.trim().toLowerCase();
+          const nameB = rowB.cells[0].textContent.trim().toLowerCase();
+          return ascending
+            ? nameA.localeCompare(nameB)
+            : nameB.localeCompare(nameA);
+        });
+
+        tbody.innerHTML = "";
+        rows.forEach((row) => tbody.appendChild(row));
+
+        table.dataset.ascending = !ascending;
+        const th = table.querySelector("th");
+        th.textContent = ascending ? "Name ⬆️" : "Name ⬇️";
+      }
+
+      function addLink() {
+        const tableId = document.getElementById("tableSelect").value;
+        const table = document.getElementById(tableId);
+        const linkName = document.getElementById("linkName").value;
+        const linkURL = document.getElementById("linkURL").value;
+
+        if (linkName && linkURL) {
+          const fullURL = linkURL.startsWith("http")
+            ? linkURL
+            : "http://" + linkURL;
+
+          const newRow = table.querySelector("tbody").insertRow();
+          newRow.innerHTML = ` 
+            <td>${linkName}</td>
+            <td><button onclick="window.open('${fullURL}', '_blank')">Click</button></td>
+          `;
+
+          let links = JSON.parse(localStorage.getItem("links")) || {};
+          if (!links[tableId]) {
+            links[tableId] = [];
+          }
+          links[tableId].push({ name: linkName, url: fullURL });
+          localStorage.setItem("links", JSON.stringify(links));
+
+          showStatusMessage(`ลิงก์ '${linkName}' ถูกเพิ่มแล้ว`);
+        } else {
+          showStatusMessage("กรุณากรอกชื่อและ URL ของลิงก์");
+        }
+      }
+
+      function deleteLink() {
+        const tableId = document.getElementById("tableSelect").value;
+        const table = document.getElementById(tableId);
+        const linkName = document.getElementById("linkName").value;
+
+        const row = [...table.rows].find(
+          (row) => row.cells[0].textContent === linkName
+        );
+
+        if (row) {
+          const confirmDelete = window.confirm(
+            `คุณแน่ใจที่จะลบลิงก์ '${linkName}'?`
+          );
+          if (confirmDelete) {
+            row.remove();
+            showStatusMessage(`ลิงก์ '${linkName}' ถูกลบแล้ว`);
+
+            let links = JSON.parse(localStorage.getItem("links")) || {};
+            links[tableId] = links[tableId].filter(
+              (link) => link.name !== linkName
+            );
+            localStorage.setItem("links", JSON.stringify(links));
+          } else {
+            showStatusMessage("การลบลิงก์ถูกยกเลิก");
+          }
+        } else {
+          showStatusMessage("ไม่พบลิงก์ที่ต้องการลบ");
+        }
+      }
+
+      function addTable() {
+        const tableName = document.getElementById("newTableName").value;
+
+        if (tableName) {
+          const confirmAddTable = window.confirm(
+            `คุณแน่ใจที่จะเพิ่มตารางชื่อ '${tableName}'?`
+          );
+          if (confirmAddTable) {
+            const newTable = document.createElement("table");
+            newTable.id = tableName;
+            newTable.innerHTML = `
+              <thead>
+                  <tr>
+                      <th onclick="sortTable('${tableName}')">Name ⬍</th>
+                      <th>Link</th>
+                  </tr>
+              </thead>
+              <tbody></tbody>
+            `;
+            document.querySelector(".left").appendChild(newTable);
+
+            const tables = JSON.parse(localStorage.getItem("tables")) || [];
+            tables.push(tableName);
+            localStorage.setItem("tables", JSON.stringify(tables));
+
+            updateTableSelect();
+
+            showStatusMessage(`ตาราง '${tableName}' ถูกเพิ่มแล้ว`);
+          }
+        } else {
+          showStatusMessage("กรุณากรอกชื่อของตาราง");
+        }
+      }
+
+      function deleteTable() {
+        const tableName = document.getElementById("tableDeleteSelect").value;
+
+        if (tableName) {
+          const confirmDeleteTable = window.confirm(
+            `คุณแน่ใจที่จะลบตาราง '${tableName}'?`
+          );
+          if (confirmDeleteTable) {
+            const table = document.getElementById(tableName);
+            if (table) {
+              table.remove();
+
+              let tables = JSON.parse(localStorage.getItem("tables")) || [];
+              tables = tables.filter((table) => table !== tableName);
+              localStorage.setItem("tables", JSON.stringify(tables));
+
+              updateTableSelect();
+
+              showStatusMessage(`ตาราง '${tableName}' ถูกลบแล้ว`);
+            }
+          } else {
+            showStatusMessage("การลบตารางถูกยกเลิก");
+          }
+        } else {
+          showStatusMessage("ไม่พบตารางที่ต้องการลบ");
+        }
+      }
+
+      function exportData() {
+        const tables = JSON.parse(localStorage.getItem("tables")) || [];
+        const links = JSON.parse(localStorage.getItem("links")) || {};
+
+        const data = {
+          tables: tables,
+          links: links,
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], {
+          type: "application/json",
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "table_data.json";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        showStatusMessage("ข้อมูลถูก Export แล้ว");
+      }
+
+      function importData() {
+        const fileInput = document.getElementById("importFile");
+        fileInput.click();
+
+        fileInput.onchange = function (event) {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              try {
+                const data = JSON.parse(e.target.result);
+                localStorage.setItem("tables", JSON.stringify(data.tables));
+                localStorage.setItem("links", JSON.stringify(data.links));
+
+                // Reload the page to reflect the changes
+                window.location.reload();
+              } catch (error) {
+                showStatusMessage("ไฟล์ไม่ถูกต้อง");
+              }
+            };
+            reader.readAsText(file);
+          }
+        };
+      }
+
+      function showStatusMessage(message) {
+        const statusMessage = document.getElementById("statusMessage");
+        statusMessage.textContent = message;
+        statusMessage.style.display = "block";
+        setTimeout(() => {
+          statusMessage.style.display = "none";
+        }, 3000);
+      }
+
+      function clearScreen() {
+        const confirmClear = window.confirm(
+          "คุณแน่ใจที่จะล้างหน้าจอทั้งหมด? การกระทำนี้จะลบทุกตารางและลิงก์!"
+        );
+        if (confirmClear) {
+          // ล้างข้อมูลใน localStorage
+          localStorage.removeItem("tables");
+          localStorage.removeItem("links");
+
+          // รีโหลดหน้าเว็บเพื่อล้างหน้าจอ
+          window.location.reload();
+        }
+      }
+
+      function importDefaultData() {
+        fetch("https://pwai1g.github.io/Weblink/Default_List.json")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.tables && data.links) {
+              localStorage.setItem("tables", JSON.stringify(data.tables));
+              localStorage.setItem("links", JSON.stringify(data.links));
+
+              showStatusMessage("Import Default สำเร็จแล้ว!");
+              window.location.reload(); // รีโหลดหน้าเพื่ออัปเดตตาราง
+            } else {
+              showStatusMessage("ไฟล์ Default_List.JSON ไม่ถูกต้อง!");
+            }
+          })
+          .catch((error) => {
+            console.error("Error loading Default_List.JSON:", error);
+            showStatusMessage("เกิดข้อผิดพลาดในการโหลด Default_List.JSON");
+          });
+      }
+
+      function refreshPage() {
+        location.reload(); // รีโหลดหน้าเว็บใหม่
+      }
+    </script>
+  </body>
+</html>
