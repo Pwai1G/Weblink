@@ -1,46 +1,26 @@
 {
   "tables": [
-    "Genesys",
-    "CardX Collection",
-    "G-Able"
+    "Test1",
+    "Test2",
+    "Test3"
   ],
   "links": {
-    "Genesys": [
+    "Test1": [
       {
-        "name": "Genesys OSM",
-        "url": "https://gms.genesys.com/portal/en/home"
-      },
-      {
-        "name": "Genesys Support",
-        "url": "https://genesys.my.site.com/customercare"
+        "name": "google",
+        "url": "http://www.google.com"
       }
     ],
-    "CardX Collection": [
+    "Test2": [
       {
-        "name": "Genesys UAT",
-        "url": "https://login.mypurecloud.jp/oauth/authorize"
-      },
-      {
-        "name": "EFS UAT",
-        "url": "https://cardxefsuat.exuscloud.co.uk/Web/Account/Start"
-      },
-      {
-        "name": "Kibana",
-        "url": "https://cdx-np-monitoring.kb.ap-southeast-1.aws.found.io:9243/login?next=%2Fapp%2Fdiscover#/?_g=(filters:!(),refreshInterval:(pause:!f,value:600000),time:(from:%272025-02-19T06:00:00.000Z%27,to:%272025-02-19T08:00:00.000Z%27))&_a=(columns:!(message),dataSource:(dataViewId:cdx-ecs-api-log-ms,type:dataView),filters:!((%27$state%27:(store:appState),meta:(alias:!n,disabled:!f,field:cardx.service.environment,index:cdx-ecs-api-log-ms,key:cardx.service.environment,negate:!f,params:(query:uat2),type:phrase),query:(match_phrase:(cardx.service.environment:uat2)))),interval:auto,query:(language:kuery,query:collection-dialer-telephony),rowsPerPage:500,sort:!(!(%27@timestamp%27,desc)))"
+        "name": "google",
+        "url": "http://www.google.com"
       }
     ],
-    "G-Able": [
+    "Test3": [
       {
-        "name": "Workday",
-        "url": "https://wd3.myworkday.com/wday/authgwy/gable/login.htmld"
-      },
-      {
-        "name": "Intranet",
-        "url": "https://gablegrp.sharepoint.com/sites/intranet/"
-      },
-      {
-        "name": "Ivanti",
-        "url": "https://gable-ism.ivanticloud.com/Login.aspx?ProviderName=Microsoft%20365&Scope=SelfServiceMobile&Role=SelfServiceMobile"
+        "name": "google",
+        "url": "http://www.google.com"
       }
     ]
   }
