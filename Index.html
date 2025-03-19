@@ -51,7 +51,7 @@
         border: 1px solid black;
         padding: 10px;
         text-align: center;
-        width: 50%;
+        width: 80%;
       }
 
       th {
@@ -185,8 +185,11 @@
           <!-- เพิ่มปุ่ม Clear Screen -->
           <h3>Clear Screen</h3>
           <button onclick="clearScreen()">Clear Screen</button>
+          <button onclick="logout()">Logout</button>
+
         </div>  
         </div>
+        
 
         <div class="status-message" id="statusMessage"></div>
       </div>
@@ -490,6 +493,14 @@
             showStatusMessage("เกิดข้อผิดพลาดในการโหลด Default_List.JSON");
           });
       }
+
+      function logout() {
+        const confirmLogout = window.confirm("คุณต้องการออกจากระบบหรือไม่?");
+        if (confirmLogout) {
+        localStorage.removeItem("loggedIn"); // ลบสถานะล็อกอิน
+        window.location.href = "login.html"; // ส่งผู้ใช้กลับไปหน้า Login
+    }
+}
     </script>
   </body>
 </html>
