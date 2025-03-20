@@ -81,12 +81,12 @@
           Link Management
         </h2>
         <button id="refreshButton" onclick="refreshPage()">🔄 Refresh</button>
+        <p id="lastUpdated">⏳ กำลังโหลดข้อมูลอัปเดต...</p>
         <div id="tables-container"></div>
       </div>
 
       <div class="right">
         <h2>Manage Data</h2>
-
         <input
           type="file"
           id="importFile"
@@ -111,6 +111,10 @@
             location.reload();
           });
         loadTables();
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchLastUpdateTime();
       });
 
       function loadTables() {
@@ -253,6 +257,37 @@
           // 🔄 รีโหลดหน้าใหม่เพื่อให้โหลด JSON ล่าสุด
           location.reload(true);
         }
+      }
+
+      function fetchLastUpdateTime() {
+        const repoOwner = "pwai1g"; // 👈 เปลี่ยนเป็นเจ้าของ repo
+        const repoName = "Weblink"; // 👈 เปลี่ยนเป็นชื่อ repo
+        const filePath = "Default_List.json"; // 👈 เปลี่ยนเป็น path ของไฟล์
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/commits?path=${filePath}`;
+
+        fetch(apiUrl)
+          .then((response) => {
+            if (!response.ok) throw new Error("ไม่สามารถโหลดข้อมูล commit");
+            return response.json();
+          })
+          .then((data) => {
+            if (data.length > 0) {
+              const lastCommitDate = new Date(
+                data[0].commit.committer.date
+              ).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" });
+              document.getElementById(
+                "lastUpdated"
+              ).innerHTML = `🔄 Last Default Update: ${lastCommitDate}`;
+            } else {
+              document.getElementById("lastUpdated").innerHTML =
+                "⚠️ ไม่พบข้อมูล commit";
+            }
+          })
+          .catch((error) => {
+            console.error("❌ Fetch Error:", error);
+            document.getElementById("lastUpdated").innerHTML =
+              "❌ เกิดข้อผิดพลาดในการโหลดข้อมูล";
+          });
       }
     </script>
   </body>

@@ -119,6 +119,7 @@
           Link Management
         </h2>
         <button id="refreshButton" onclick="refreshPage()">🔄 Refresh</button>
+        <p id="lastUpdated">⏳ กำลังโหลดข้อมูลอัปเดต...</p>
         <div id="tables-container"></div>
       </div>
 
@@ -213,6 +214,10 @@
 
         updateTableSelect();
       };
+
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchLastUpdateTime();
+      });
 
       function createTable(tableName, links) {
         const leftSection = document.querySelector(".left");
@@ -498,22 +503,32 @@
       }
 
       function importDefaultData() {
-        fetch("https://pwai1g.github.io/Weblink/Default_List.json")
-          .then((response) => response.json())
+        console.log("⏳ กำลังโหลด Default Data...");
+
+        fetch("https://pwai1g.github.io/Weblink/Default_List.json", {
+          cache: "no-cache",
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("ไม่สามารถโหลดไฟล์ Default_List.json ได้");
+            }
+            return response.json();
+          })
           .then((data) => {
             if (data.tables && data.links) {
               localStorage.setItem("tables", JSON.stringify(data.tables));
               localStorage.setItem("links", JSON.stringify(data.links));
 
-              showStatusMessage("Import Default สำเร็จแล้ว!");
-              window.location.reload(); // รีโหลดหน้าเพื่ออัปเดตตาราง
+              console.log("✅ Default Data นำเข้าเรียบร้อย!");
+              alert("Import Default สำเร็จแล้ว!");
+              location.reload();
             } else {
-              showStatusMessage("ไฟล์ Default_List.JSON ไม่ถูกต้อง!");
+              alert("⚠️ ไฟล์ Default_List.json ไม่ถูกต้อง!");
             }
           })
           .catch((error) => {
-            console.error("Error loading Default_List.JSON:", error);
-            showStatusMessage("เกิดข้อผิดพลาดในการโหลด Default_List.JSON");
+            console.error("❌ เกิดข้อผิดพลาด:", error);
+            alert("เกิดข้อผิดพลาดในการโหลด Default_List.json");
           });
       }
 
@@ -521,6 +536,8 @@
         location.reload(); // รีโหลดหน้าเว็บใหม่
       }
       function updateDefaultData() {
+        console.log("🔄 กำลังอัปเดต Default_List.json...");
+
         // ดึงข้อมูลจาก HTML Table แทน Local Storage
         const tables = [];
         const links = {};
@@ -547,22 +564,33 @@
 
         const updatedData = JSON.stringify({ tables, links }, null, 2);
 
-        const githubToken = "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"; // 🔴 ใส่ Token ที่นี่
+        const githubToken = "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"; // 🔴 ใส่ Token ที่นี่
         const repoOwner = "pwai1g"; // 🔴 ชื่อเจ้าของ Repository
         const repoName = "Weblink"; // 🔴 ชื่อ Repository
         const filePath = "Default_List.json"; // 🔴 ไฟล์ที่ต้องการแก้ไข
         const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
 
+        // ✅ Debug: ตรวจสอบ JSON ที่จะอัปเดต
+        console.log("📌 JSON ที่จะอัปเดต:", updatedData);
+
         // ดึง SHA ล่าสุดของไฟล์ (GitHub ต้องใช้ SHA ของไฟล์เดิมเพื่ออัปเดต)
         fetch(apiUrl, {
-          headers: { Authorization: `token ${githubToken}` },
+          headers: {
+            Authorization: `token ${githubToken}`,
+            Accept: "application/vnd.github.v3+json",
+          },
         })
           .then((response) => response.json())
           .then((data) => {
+            if (!data.sha) {
+              throw new Error("❌ ไม่พบ SHA ของไฟล์ Default_List.json");
+            }
             const fileSha = data.sha; // SHA ของไฟล์ปัจจุบัน
 
+            console.log("✅ SHA ของไฟล์:", fileSha);
+
             // อัปเดตไฟล์ `Default_List.json`
-            fetch(apiUrl, {
+            return fetch(apiUrl, {
               method: "PUT",
               headers: {
                 Authorization: `token ${githubToken}`,
@@ -573,21 +601,23 @@
                 content: btoa(updatedData), // แปลง JSON เป็น Base64
                 sha: fileSha, // ต้องใช้ SHA ของไฟล์เดิม
               }),
-            })
-              .then((response) => response.json())
-              .then(() => {
-                showStatusMessage("อัปเดต Default_List.json สำเร็จแล้ว! ✅");
-              })
-              .catch((error) => {
-                console.error("Error updating file:", error);
-                showStatusMessage("เกิดข้อผิดพลาดในการอัปเดตไฟล์ ❌");
-              });
+            });
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.commit) {
+              console.log("✅ ไฟล์ Default_List.json ถูกอัปเดตเรียบร้อย!");
+              showStatusMessage("อัปเดต Default_List.json สำเร็จแล้ว! ✅");
+            } else {
+              throw new Error("❌ อัปเดตไม่สำเร็จ");
+            }
           })
           .catch((error) => {
-            console.error("Error fetching file SHA:", error);
-            showStatusMessage("เกิดข้อผิดพลาดในการดึงข้อมูลไฟล์ ❌");
+            console.error("❌ Error updating file:", error);
+            showStatusMessage("เกิดข้อผิดพลาดในการอัปเดตไฟล์ ❌");
           });
       }
+
       function clearCache() {
         const confirmClear = window.confirm(
           "คุณแน่ใจที่จะเคลียร์แคชและรีเซ็ตข้อมูลทั้งหมดหรือไม่?"
@@ -607,6 +637,37 @@
           // 🔄 รีโหลดหน้าใหม่เพื่อให้โหลด JSON ล่าสุด
           location.reload(true);
         }
+      }
+
+      function fetchLastUpdateTime() {
+        const repoOwner = "pwai1g"; // 👈 เปลี่ยนเป็นเจ้าของ repo
+        const repoName = "Weblink"; // 👈 เปลี่ยนเป็นชื่อ repo
+        const filePath = "Default_List.json"; // 👈 เปลี่ยนเป็น path ของไฟล์
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/commits?path=${filePath}`;
+
+        fetch(apiUrl)
+          .then((response) => {
+            if (!response.ok) throw new Error("ไม่สามารถโหลดข้อมูล commit");
+            return response.json();
+          })
+          .then((data) => {
+            if (data.length > 0) {
+              const lastCommitDate = new Date(
+                data[0].commit.committer.date
+              ).toLocaleString("th-TH", { timeZone: "Asia/Bangkok" });
+              document.getElementById(
+                "lastUpdated"
+              ).innerHTML = `🔄 Last Default Update: ${lastCommitDate}`;
+            } else {
+              document.getElementById("lastUpdated").innerHTML =
+                "⚠️ ไม่พบข้อมูล commit";
+            }
+          })
+          .catch((error) => {
+            console.error("❌ Fetch Error:", error);
+            document.getElementById("lastUpdated").innerHTML =
+              "❌ เกิดข้อผิดพลาดในการโหลดข้อมูล";
+          });
       }
     </script>
   </body>
