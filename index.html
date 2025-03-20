@@ -185,7 +185,9 @@
         <div><br /></div>
         <h3>Default Data</h3>
         <button onclick="importDefaultData()">Import Default</button>
-
+        <div><br /></div>
+        <h3>Update Data</h3>
+        <button onclick="updateDefaultData()">Update Default</button>
         <input type="file" id="importFile" style="display: none" />
 
         <div><br /></div>
@@ -409,25 +411,45 @@
       }
 
       function exportData() {
-        const tables = JSON.parse(localStorage.getItem("tables")) || [];
-        const links = JSON.parse(localStorage.getItem("links")) || {};
+        // ดึงข้อมูลจาก HTML Table แทน Local Storage
+        const tables = [];
+        const links = {};
 
-        const data = {
-          tables: tables,
-          links: links,
-        };
+        document.querySelectorAll(".left h2").forEach((heading) => {
+          const tableName = heading.textContent.trim();
+          const table = heading.nextElementSibling;
 
-        const blob = new Blob([JSON.stringify(data, null, 2)], {
-          type: "application/json",
+          if (table && table.tagName.toLowerCase() === "table") {
+            tables.push(tableName);
+            links[tableName] = [];
+
+            table.querySelectorAll("tbody tr").forEach((row) => {
+              const name = row.cells[0].textContent.trim();
+              const url = row.cells[1]
+                .querySelector("button")
+                .onclick.toString()
+                .match(/window\.open\(['"](.+?)['"]/)[1]; // ดึง URL จากปุ่ม Click
+
+              links[tableName].push({ name, url });
+            });
+          }
         });
+
+        const data = { tables, links };
+        const jsonString = JSON.stringify(data, null, 2);
+
+        const blob = new Blob([jsonString], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
+
         a.href = url;
         a.download = "table_data.json";
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        showStatusMessage("ข้อมูลถูก Export แล้ว");
+        showStatusMessage("ข้อมูลถูก Export แล้ว ✅");
       }
 
       function importData() {
@@ -479,7 +501,9 @@
       }
 
       function importDefaultData() {
-        fetch("https://pwai1g.github.io/Weblink/Default_List.json")
+        fetch("https://pwai1g.github.io/Weblink/Default_List.json", {
+          cache: "no-cache",
+        })
           .then((response) => response.json())
           .then((data) => {
             if (data.tables && data.links) {
@@ -507,6 +531,74 @@
       }
       function refreshPage() {
         location.reload(); // รีโหลดหน้าเว็บใหม่
+      }
+      function updateDefaultData() {
+        // ดึงข้อมูลจาก HTML Table แทน Local Storage
+        const tables = [];
+        const links = {};
+
+        document.querySelectorAll(".left h2").forEach((heading) => {
+          const tableName = heading.textContent.trim();
+          const table = heading.nextElementSibling;
+
+          if (table && table.tagName.toLowerCase() === "table") {
+            tables.push(tableName);
+            links[tableName] = [];
+
+            table.querySelectorAll("tbody tr").forEach((row) => {
+              const name = row.cells[0].textContent.trim();
+              const url = row.cells[1]
+                .querySelector("button")
+                .onclick.toString()
+                .match(/window\.open\(['"](.+?)['"]/)[1]; // ดึง URL จากปุ่ม Click
+
+              links[tableName].push({ name, url });
+            });
+          }
+        });
+
+        const updatedData = JSON.stringify({ tables, links }, null, 2);
+
+        const githubToken = "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"; // 🔴 ใส่ Token ที่นี่
+        const repoOwner = "pwai1g"; // 🔴 ชื่อเจ้าของ Repository
+        const repoName = "Weblink"; // 🔴 ชื่อ Repository
+        const filePath = "Default_List.json"; // 🔴 ไฟล์ที่ต้องการแก้ไข
+        const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${filePath}`;
+
+        // ดึง SHA ล่าสุดของไฟล์ (GitHub ต้องใช้ SHA ของไฟล์เดิมเพื่ออัปเดต)
+        fetch(apiUrl, {
+          headers: { Authorization: `token ${githubToken}` },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const fileSha = data.sha; // SHA ของไฟล์ปัจจุบัน
+
+            // อัปเดตไฟล์ `Default_List.json`
+            fetch(apiUrl, {
+              method: "PUT",
+              headers: {
+                Authorization: `token ${githubToken}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                message: "Updated Default_List.json from website",
+                content: btoa(updatedData), // แปลง JSON เป็น Base64
+                sha: fileSha, // ต้องใช้ SHA ของไฟล์เดิม
+              }),
+            })
+              .then((response) => response.json())
+              .then(() => {
+                showStatusMessage("อัปเดต Default_List.json สำเร็จแล้ว! ✅");
+              })
+              .catch((error) => {
+                console.error("Error updating file:", error);
+                showStatusMessage("เกิดข้อผิดพลาดในการอัปเดตไฟล์ ❌");
+              });
+          })
+          .catch((error) => {
+            console.error("Error fetching file SHA:", error);
+            showStatusMessage("เกิดข้อผิดพลาดในการดึงข้อมูลไฟล์ ❌");
+          });
       }
     </script>
   </body>

@@ -208,7 +208,9 @@
       function importDefaultData() {
         console.log("⏳ กำลังโหลด Default Data...");
 
-        fetch("https://pwai1g.github.io/Weblink/Default_List.json")
+        fetch("https://pwai1g.github.io/Weblink/Default_List.json", {
+          cache: "no-cache",
+        })
           .then((response) => {
             if (!response.ok) {
               throw new Error("ไม่สามารถโหลดไฟล์ Default_List.json ได้");
