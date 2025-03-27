@@ -290,5 +290,31 @@
           });
       }
     </script>
+
+    <script type="text/javascript" charset="utf-8">
+      (function (g, e, n, es, ys) {
+        g["_genesysJs"] = e;
+        g[e] =
+          g[e] ||
+          function () {
+            (g[e].q = g[e].q || []).push(arguments);
+          };
+        g[e].t = 1 * new Date();
+        g[e].c = es;
+        ys = document.createElement("script");
+        ys.async = 1;
+        ys.src = n;
+        ys.charset = "utf-8";
+        document.head.appendChild(ys);
+      })(
+        window,
+        "Genesys",
+        "https://apps.mypurecloud.jp/genesys-bootstrap/genesys.min.js",
+        {
+          environment: "prod-apne1",
+          deploymentId: "2bb7311e-6cdb-4e4a-8b50-c09640fe5340",
+        }
+      );
+    </script>
   </body>
 </html>
