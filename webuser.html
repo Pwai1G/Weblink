@@ -16,6 +16,7 @@
         background-color: #f8f9fa;
         color: #333;
       }
+
       .container {
         height: auto;
         padding: 1px;
@@ -38,6 +39,19 @@
         font-size: 12px;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .right h3 {
+        margin-top: 20px;
+        margin-bottom: 10px;
+      }
+
+      .right button {
+        margin-bottom: 10px;
+      }
+
+      .right select {
+        margin-bottom: 15px;
       }
 
       table {
@@ -87,18 +101,28 @@
 
       <div class="right">
         <h2>Manage Data</h2>
-        <input
-          type="file"
-          id="importFile"
-          style="display: none"
-          accept=".json"
-        />
+
+        <h3>Filter Table</h3>
+        <select
+          id="filterDropdown"
+          onchange="filterTables()"
+          style="
+            padding: 6px;
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+          "
+        >
+          <option value="all">-- แสดงทั้งหมด --</option>
+        </select>
+
         <button onclick="importDefaultData()">Import Link</button>
+
         <h3>Clear Screen</h3>
         <button onclick="clearScreen()">Clear Screen</button>
+
         <h3>Clear Cache</h3>
         <button onclick="clearCache()">Clear Cache</button>
-        <div><br /></div>
       </div>
     </div>
 
@@ -110,10 +134,9 @@
           .addEventListener("click", function () {
             location.reload();
           });
-        loadTables();
-      });
 
-      document.addEventListener("DOMContentLoaded", function () {
+        loadTables();
+        populateDropdown();
         fetchLastUpdateTime();
       });
 
@@ -157,61 +180,38 @@
         });
       }
 
-      function exportData() {
-        const data = {
-          tables: JSON.parse(localStorage.getItem("tables")) || [],
-          links: JSON.parse(localStorage.getItem("links")) || {},
-        };
-        const blob = new Blob([JSON.stringify(data, null, 2)], {
-          type: "application/json",
+      function populateDropdown() {
+        const tables = JSON.parse(localStorage.getItem("tables")) || [];
+        const dropdown = document.getElementById("filterDropdown");
+
+        dropdown.innerHTML = '<option value="all">-- แสดงทั้งหมด --</option>';
+
+        tables.forEach((tableName) => {
+          const option = document.createElement("option");
+          option.value = tableName;
+          option.textContent = tableName;
+          dropdown.appendChild(option);
         });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "table_data.json";
-        a.click();
-        URL.revokeObjectURL(url);
       }
 
-      function importData() {
-        const fileInput = document.getElementById("importFile");
-        fileInput.click();
-        fileInput.onchange = function (event) {
-          const file = event.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              try {
-                const data = JSON.parse(e.target.result);
-                localStorage.setItem("tables", JSON.stringify(data.tables));
-                localStorage.setItem("links", JSON.stringify(data.links));
-                location.reload();
-              } catch (error) {
-                alert("ไฟล์ไม่ถูกต้อง");
-              }
-            };
-            reader.readAsText(file);
+      function filterTables() {
+        const selectedValue = document
+          .getElementById("filterDropdown")
+          .value.toLowerCase();
+        const tableDivs = document.querySelectorAll("#tables-container > div");
+
+        tableDivs.forEach((div) => {
+          const title = div.querySelector("h3").textContent.toLowerCase();
+          if (selectedValue === "all" || title === selectedValue) {
+            div.style.display = "block";
+          } else {
+            div.style.display = "none";
           }
-        };
+        });
       }
 
-      function clearScreen() {
-        if (confirm("คุณแน่ใจที่จะล้างหน้าจอทั้งหมด?")) {
-          localStorage.removeItem("tables");
-          localStorage.removeItem("links");
-          location.reload();
-        }
-      }
-
-      function logout() {
-        if (confirm("คุณต้องการออกจากระบบหรือไม่?")) {
-          localStorage.removeItem("loggedIn");
-          window.location.href = "login.html";
-        }
-      }
       function importDefaultData() {
         console.log("⏳ กำลังโหลด Default Data...");
-
         fetch("https://pwai1g.github.io/Weblink/Default_List.json", {
           cache: "no-cache",
         })
@@ -238,31 +238,34 @@
             alert("เกิดข้อผิดพลาดในการโหลด Default_List.json");
           });
       }
+
+      function clearScreen() {
+        if (confirm("คุณแน่ใจที่จะล้างหน้าจอทั้งหมด?")) {
+          localStorage.removeItem("tables");
+          localStorage.removeItem("links");
+          location.reload();
+        }
+      }
+
       function clearCache() {
         const confirmClear = window.confirm(
           "คุณแน่ใจที่จะเคลียร์แคชและรีเซ็ตข้อมูลทั้งหมดหรือไม่?"
         );
-
         if (confirmClear) {
-          // 🔴 ล้าง Local Storage
           localStorage.removeItem("tables");
           localStorage.removeItem("links");
           localStorage.clear();
-
-          // 🔴 ล้างแคชของเบราว์เซอร์
           caches.keys().then((names) => {
             names.forEach((name) => caches.delete(name));
           });
-
-          // 🔄 รีโหลดหน้าใหม่เพื่อให้โหลด JSON ล่าสุด
           location.reload(true);
         }
       }
 
       function fetchLastUpdateTime() {
-        const repoOwner = "pwai1g"; // 👈 เปลี่ยนเป็นเจ้าของ repo
-        const repoName = "Weblink"; // 👈 เปลี่ยนเป็นชื่อ repo
-        const filePath = "Default_List.json"; // 👈 เปลี่ยนเป็น path ของไฟล์
+        const repoOwner = "pwai1g";
+        const repoName = "Weblink";
+        const filePath = "Default_List.json";
         const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}/commits?path=${filePath}`;
 
         fetch(apiUrl)
@@ -289,32 +292,6 @@
               "❌ เกิดข้อผิดพลาดในการโหลดข้อมูล";
           });
       }
-    </script>
-
-    <script type="text/javascript" charset="utf-8">
-      (function (g, e, n, es, ys) {
-        g["_genesysJs"] = e;
-        g[e] =
-          g[e] ||
-          function () {
-            (g[e].q = g[e].q || []).push(arguments);
-          };
-        g[e].t = 1 * new Date();
-        g[e].c = es;
-        ys = document.createElement("script");
-        ys.async = 1;
-        ys.src = n;
-        ys.charset = "utf-8";
-        document.head.appendChild(ys);
-      })(
-        window,
-        "Genesys",
-        "https://apps.mypurecloud.jp/genesys-bootstrap/genesys.min.js",
-        {
-          environment: "prod-apne1",
-          deploymentId: "2bb7311e-6cdb-4e4a-8b50-c09640fe5340",
-        }
-      );
     </script>
   </body>
 </html>
