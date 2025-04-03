@@ -1,7 +1,8 @@
 {
   "tables": [
     "CardX Collection",
-    "G-Able"
+    "G-Able",
+    "PTT OR"
   ],
   "links": {
     "CardX Collection": [
@@ -34,6 +35,28 @@
       {
         "name": "Ivanti",
         "url": "https://gable-ism.ivanticloud.com/Login.aspx?ProviderName=Microsoft%20365&Scope=SelfServiceMobile&Role=SelfServiceMobile"
+      }
+    ],
+    "PTT OR": [
+      {
+        "name": "CyberArk Remote",
+        "url": "https://portal.alero.io"
+      },
+      {
+        "name": "Genesys Web Admin",
+        "url": "http://or-frmwrk-p01/wcm/LoginEJS.aspx?ReturnUrl=%2fwcm%2fdefault.aspx"
+      },
+      {
+        "name": "MicroStrategy 183",
+        "url": "http://10.120.202.183/MicroStrategy/servlet/mstrWeb"
+      },
+      {
+        "name": "MicroStrategy 184",
+        "url": "http://10.120.202.184/MicroStrategy/servlet/mstrWeb"
+      },
+      {
+        "name": "Change Password",
+        "url": "https://gsaas.g-able.com/request/login"
       }
     ]
   }
