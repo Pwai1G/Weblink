@@ -7,6 +7,10 @@
   "links": {
     "CardX Collection": [
       {
+        "name": "Genesys UAT",
+        "url": "https://login.mypurecloud.jp/oauth/authorize"
+      },
+      {
         "name": "EFS UAT",
         "url": "https://cardxefsuat.exuscloud.co.uk/Web/Account/Start"
       },
@@ -17,10 +21,6 @@
       {
         "name": "Genesys Prod OAuth",
         "url": "https://login.mypurecloud.jp/oauth/authorize?client_id=bb80549e-0b2a-40dc-9681-c9ab6df62419&response_type=code&redirect_uri=https://kong-prod-npci-nlb.int.cardx.co.th/collection-dialer-telephony/genesys-oauth/callback"
-      },
-      {
-        "name": "Genesys UAT",
-        "url": "https://login.mypurecloud.jp/oauth/authorize?client_id=9913ecec-2166-4a88-a3c4-3020425a2936&response_type=code&redirect_uri=https://kong-uat2-npci-clb.int-np.cardx.co.th/collection-dialer-telephony/genesys-oauth/callback"
       }
     ],
     "G-Able": [
@@ -35,6 +35,10 @@
       {
         "name": "Ivanti",
         "url": "https://gable-ism.ivanticloud.com/Login.aspx?ProviderName=Microsoft%20365&Scope=SelfServiceMobile&Role=SelfServiceMobile"
+      },
+      {
+        "name": "Genesys Bandwidth Calculator",
+        "url": "https://help.genesys.com/staging/edge_bandwidth_calculator/"
       }
     ],
     "PTT OR": [
